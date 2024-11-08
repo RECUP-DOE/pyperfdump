@@ -1,24 +1,29 @@
 #! /usr/bin/env python3
 
+# The test can run and succeed both with and without MPI
 try:
   import mpi4py
+  # We could leave initialize and finalize as True here
+  # With these set to False, we must manually initialize() and finalize() MPI
   mpi4py.rc.initialize = False
   mpi4py.rc.finalize = False
+  # Otherwise, initialize and finalize would be handled just by importing MPI
   from mpi4py import MPI
 except Exception as e:
   MPI = None
 
 import pyperfdump, sys
 
+# debugmsg can be swapped if messages regarding script status were desired
 debugmsg = lambda *args, **kwargs: None
 #debugmsg = lambda *args, **kwargs: print(*args, **kwargs)
 
+# A small loop that will take a small amount of time
 def run():
   for i in range(1000):
     for x in range(1000):
       i+=123
 
-debugmsg('hallo',flush=True)
 if __name__=='__main__':
   if MPI is not None:
     debugmsg('Calling MPI.Init()',flush=True)

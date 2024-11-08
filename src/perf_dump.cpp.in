@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////
+//  PyPerfDump, An MPI- and HDF5- enabled Python module to create PAPI dumps
+//  Copyright (C) 2024, Chase Phelps, chaseleif@icloud.com
+//                     Tanzima Islam, tanzima@txstate.edu
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+//////////////////////////////////////////////////////////////////////////////
+
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
@@ -73,7 +92,6 @@ static void update_counter_values() {
   for (const auto &event : event_set->event_names()) {
     buffer[event] += event_set->values[i++];
   }
-  return;
 }
 
 /***
@@ -184,11 +202,11 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 #endif
-  // char pointer for getenv
-  char *env_str = nullptr;
   // initialize PAPI
   PAPI_library_init(PAPI_VER_CURRENT);
   event_set = (PAPIEventSet*) new PAPIEventSet();
+  // char pointer for getenv
+  char *env_str;
   // get counters by name with PDUMP_EVENTS
   if ((env_str = std::getenv("PDUMP_EVENTS"))) {
     std::vector<std::string> env_event_names;
@@ -242,7 +260,6 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   }
   else
     filename = "./";
-  env_str = std::getenv("PDUMP_FILENAME");
   if ((env_str=std::getenv("PDUMP_FILENAME")))
     filename += std::string(env_str);
   else
@@ -256,7 +273,13 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   }
   else {
     dump = dumphdf5;
+  #ifdef USE_MPI
+    // The number of processes affects the dimensionality of HDF5 files
+    // use the number of ranks in the end of the filename to prevent issues
+    filename += "." + std::to_string(num_procs) + ".h5";
+  #else
     filename += ".h5";
+  #endif
   }
 #else
   // if HDF5 is not enabled then we will dump csv
@@ -346,9 +369,6 @@ static PyObject *method_end_region(PyObject *self, PyObject *args) {
     generic_region_name = nullptr;
   }
   current_state = PD_LIBINIT;
-#ifdef USE_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
   Py_RETURN_NONE;
 }
 

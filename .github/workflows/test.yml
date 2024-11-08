@@ -22,7 +22,7 @@ jobs:
           sudo apt install build-essential python3-dev \
                            papi-tools libpapi-dev \
                            libhdf5-dev hdf5-tools
-      - name: Build+Test for non-MPI HDF5 disabled
+      - name: Build+Test for non-MPI with HDF5 disabled
         run: |
           export PYTHONPATH="$(pwd):$PYTHONPATH"
           mkdir build && cd build
@@ -35,7 +35,7 @@ jobs:
           grep "Runtime" perf_dump.csv
           rm perf_dump.csv
           cd ..
-      - name: Build+Test for non-MPI HDF5 enabled
+      - name: Build+Test for non-MPI with HDF5 enabled
         run: |
           export PYTHONPATH="$(pwd):$PYTHONPATH"
           cd build
@@ -58,7 +58,7 @@ jobs:
           sudo apt purge libhdf5-dev hdf5-tools
           sudo apt install mpi-default-dev python3-mpi4py \
                            libhdf5-mpi-dev hdf5-tools
-      - name: Build+Test MPI for MPI HDF5 disabled
+      - name: Build+Test for MPI with HDF5 disabled
         run: |
           export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
           export PYTHONPATH="$(pwd):$PYTHONPATH"
@@ -72,7 +72,7 @@ jobs:
           grep "Runtime" perf_dump.csv
           rm perf_dump.csv
           cd ..
-      - name: Build+Test MPI for MPI HDF5 enabled
+      - name: Build+Test for MPI with HDF5 enabled
         run: |
           export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
           export PYTHONPATH="$(pwd):$PYTHONPATH"
@@ -90,6 +90,6 @@ jobs:
           rm perf_dump.csv
           export PDUMP_OUTPUT_FORMAT=hdf5
           mpiexec --oversubscribe -n 2 python3 test.py
-          h5dump perf_dump.h5 | grep "Runtime"
-          rm perf_dump.h5
+          h5dump perf_dump.2.h5 | grep "Runtime"
+          rm perf_dump.2.h5
           cd ..

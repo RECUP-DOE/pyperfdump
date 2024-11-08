@@ -45,44 +45,50 @@ CMake will attempt to automatically detect MPI and HDF5.
 though will be disabled if support is not found for these features.
 
 Configuration occurs in this order:
-- If `USE_MPI` is true, and find MPI is not successful, `USE_MPI` will be false.
-- If `ENABLE_HDF5` is true, find HDF5 is performed and the variant is confirmed.
-  - If HDF5 is not found, `ENABLE_HDF5` will be false.
-  - If `USE_MPI` is true, and the HDF5 found is not parallel,
+- If `USE_MPI` is true, and MPI is not found, `USE_MPI` will be false.
+- If `ENABLE_HDF5` is true, and HDF5 is not found, `ENABLE_HDF5` will be false.
+- If `ENABLE_HDF5` and `USE_MPI` are true and the HDF5 found is not parallel,
 `ENABLE_HDF5` will be false.
-  - If `USE_MPI` is false, and the HDF5 found is parallel,
+- If `ENABLE_HDF5` is true, `USE_MPI` is false, and the HDF5 found is parallel,
 `ENABLE_HDF5` will be false.
 
-*A message will be printed if an option is changed due to configuration.*
+*A message will be printed if an option is disabled by the above conditions.*
 
 Use of MPI changes multiple aspects within the module,
-while csv output may still be chosen when HDF5 is enabled.
+so the option is to `USE_MPI`.
+Enabling HDF5 does not preclude generation of csv outputs,
+so the option is to `ENABLE_HDF5`.
 
 To disable options, modify the CMake command, e.g, `cmake -DUSE_MPI=false ..`
 
 Additional CMake Variables
 ---
-- `DECREFNONE` handles differing treatment of Python None objects,
+- `DECREFNONE` handles differing treatment of Python None objects
 and is *automatically* configured.
-- `SILENCE_WARNINGS` is by default false,
+- `SILENCE_WARNINGS` is by default false
 and can be enabled to suppress warnings for non-fatal out-of-order module usage.
 
 Build Issues
 ---
 If CMake is unable to locate a requirement, e.g., HDF5, it will accept hints:
 ```bash
+$ Python_ROOT_DIR=/path/to/python3
+$ export Python_ROOT_DIR
+$ PAPI_PREFIX=/path/to/papi
+$ export PAPI_PREFIX
 $ cmake -DMPI_HOME=/path/to/mpi -DHDF5_ROOT=/path/to/hdf5 ..
 ```
 
 Usage
 ---
 **PyPerfDump with MPI:** *mpi4py* **must** be used as
-the *pyperfdump* module **expects**
+the *pyperfdump* module **requires**
 `MPI_Init()` and `MPI_Finalize()` to be called elsewhere.
 
 Within a Python script, use of the *pyperfdump* module
 follows a pairwise nested usage:
 ```python3
+#from mpi4py import MPI
 import pyperfdump
 
 # Call init to initialize the module
@@ -128,17 +134,15 @@ The base filename for the dump file, defaults to `perf_dump`
 - `PDUMP_OUTPUT_FORMAT`:
 The format (csv or hdf5) for the dump, defaults to hdf5 if enabled
 
+Output filenames are automatically given either `.csv` or `.h5` endings.
+Additionally, when using MPI, HDF5 output filenames will include the number
+of ranks, e.g., `.2.h5`, to prevent dimension-related issues.
+
 Either `PDUMP_EVENTS` *or* `PDUMP_CODES`
 **must** be set prior to calling `pyperfdump.init()`.
+An exception will be raised if there no counters to collect.
 
 A ***warning*** will be printed if a counter name or code cannot be used
 (with the reason why).
 
 An ***error*** will occur if no counters can be added.
-
-Release
--------------
-*PyPerfDump* is ~~released~~ under **TODO: GNU GPL v3 ... notes, etc.**
-
-The original `perf-dump` project was released under an LGPL license.
-`LLNL-CODE-647187`

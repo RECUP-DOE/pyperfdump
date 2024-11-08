@@ -1,5 +1,6 @@
-// 2024, Chase Phelps
-// original license below
+//////////////////////////////////////////////////////////////////////////////
+// This file reduced and modified for PyPerfDump
+// 2024 Chase Phelps
 //////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2013, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory.
@@ -44,9 +45,9 @@ PAPIEventSet::~PAPIEventSet() {
   PAPI_CHECK(PAPI_destroy_eventset(&event_set_), "%s", "destroy_eventset()");
 }
 
-int PAPIEventSet::add_from_names(std::vector<std::string> &event_names) {
+size_t PAPIEventSet::add_from_names(std::vector<std::string> &event_names) {
   const size_t num_counters = (size_t)PAPI_num_hwctrs();
-  size_t i = 0;
+  size_t count = 0;
   for (const auto &name : event_names) {
     int event;
     const int papi_code = PAPI_event_name_to_code(name.c_str(), &event);
@@ -57,18 +58,18 @@ int PAPIEventSet::add_from_names(std::vector<std::string> &event_names) {
     }
     else if (PAPI_add_event(event_set_, event) == PAPI_OK) {
       event_names_.push_back(name);
-      if (++i == num_counters)
+      if (++count == num_counters)
         break;
     }
   }
-  values = new long long[i];
-  std::fill_n(values, i, 0);
-  return event_names_.size();
+  values = new long long[count];
+  std::fill_n(values, count, 0);
+  return count;
 }
 
-int PAPIEventSet::add_from_codes(std::vector<int> &event_codes) {
+size_t PAPIEventSet::add_from_codes(std::vector<int> &event_codes) {
   const size_t num_counters = (size_t)PAPI_num_hwctrs();
-  size_t i = 0;
+  size_t count = 0;
   for (const auto &event : event_codes) {
     char name[PAPI_MAX_STR_LEN];
     const int papi_code = PAPI_event_code_to_name(event, name);
@@ -78,13 +79,12 @@ int PAPIEventSet::add_from_codes(std::vector<int> &event_codes) {
                   event, PAPI_strerror(papi_code), papi_code);
     }
     else if (PAPI_add_event(event_set_, event) == PAPI_OK) {
-      PAPI_event_code_to_name(event, name);
       event_names_.push_back(name);
-      if (++i == num_counters)
+      if (++count == num_counters)
         break;
     }
   }
-  values = new long long[i];
-  std::fill_n(values, i, 0);
-  return event_names_.size();
+  values = new long long[count];
+  std::fill_n(values, count, 0);
+  return count;
 }
