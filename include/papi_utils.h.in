@@ -90,8 +90,8 @@ class PAPIEventSet {
     // Adds valid events to this PAPIEventSet
     // Number of events is limited to the number the architecture supports
     // Returns: The number of events that have been added.
-    int add_from_names(std::vector<std::string> &event_names);
-    int add_from_codes(std::vector<int> &event_codes);
+    size_t add_from_names(std::vector<std::string> &event_names);
+    size_t add_from_codes(std::vector<int> &event_codes);
 
     const std::vector<std::string>& event_names() const {
       return event_names_;
