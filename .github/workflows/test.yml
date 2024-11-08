@@ -25,7 +25,7 @@ jobs:
       - name: Build+Test for non-MPI HDF5 disabled
         run: |
           export PYTHONPATH="$(pwd):$PYTHONPATH"
-          cd build
+          mkdir build && cd build
           cmake -DUSE_MPI=false -DENABLE_HDF5=false ..
           make
           rm -rf *
