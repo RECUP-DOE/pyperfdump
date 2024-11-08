@@ -1,6 +1,6 @@
 # Header files are in the include directory
 
-# The sources for the shared library, requires cmake 3.19.0
+# The sources for the shared library
 add_library(pyperfdump SHARED papi_utils.cpp perf_dump.cpp dump_functions.cpp)
 
 # Don't prepend lib to the output file, i.e., make it pyperfdump.so
