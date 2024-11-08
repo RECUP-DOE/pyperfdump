@@ -1,0 +1,95 @@
+name: ubuntu-latest test
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.in'
+jobs:
+  ubuntutest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Setup system for non-MPI tests
+        run: |
+          sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
+          sudo apt update
+          sudo apt install build-essential python3-dev \
+                           papi-tools libpapi-dev \
+                           libhdf5-dev hdf5-tools
+      - name: Build+Test for non-MPI HDF5 disabled
+        run: |
+          export PYTHONPATH="$(pwd):$PYTHONPATH"
+          cd build
+          cmake -DUSE_MPI=false -DENABLE_HDF5=false ..
+          make
+          rm -rf *
+          cd ../test
+          source env.sh
+          python3 test.py
+          grep "Runtime" perf_dump.csv
+          rm perf_dump.csv
+          cd ..
+      - name: Build+Test for non-MPI HDF5 enabled
+        run: |
+          export PYTHONPATH="$(pwd):$PYTHONPATH"
+          cd build
+          cmake -DUSE_MPI=false -DENABLE_HDF5=true ..
+          make
+          rm -rf *
+          cd ../test
+          source env.sh
+          export PDUMP_OUTPUT_FORMAT=csv
+          python3 test.py
+          grep "Runtime" perf_dump.csv
+          rm perf_dump.csv
+          export PDUMP_OUTPUT_FORMAT=hdf5
+          python3 test.py
+          h5dump perf_dump.h5 | grep "Runtime"
+          rm perf_dump.h5
+          cd ..
+      - name: Setup system for MPI tests
+        run: |
+          sudo apt purge libhdf5-dev hdf5-tools
+          sudo apt install mpi-default-dev python3-mpi4py \
+                           libhdf5-mpi-dev hdf5-tools
+      - name: Build+Test MPI for MPI HDF5 disabled
+        run: |
+          export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
+          export PYTHONPATH="$(pwd):$PYTHONPATH"
+          cd build
+          cmake -DENABLE_HDF5=false ..
+          make
+          rm -rf *
+          cd ../test
+          source env.sh
+          mpiexec --oversubscribe -n 2 python3 test.py
+          grep "Runtime" perf_dump.csv
+          rm perf_dump.csv
+          cd ..
+      - name: Build+Test MPI for MPI HDF5 enabled
+        run: |
+          export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
+          export PYTHONPATH="$(pwd):$PYTHONPATH"
+          cd build
+          HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+          export HDF5_ROOT
+          cmake ..
+          make
+          rm -rf *
+          cd ../test
+          source env.sh
+          export PDUMP_OUTPUT_FORMAT=csv
+          mpiexec --oversubscribe -n 2 python3 test.py
+          grep "Runtime" perf_dump.csv
+          rm perf_dump.csv
+          export PDUMP_OUTPUT_FORMAT=hdf5
+          mpiexec --oversubscribe -n 2 python3 test.py
+          h5dump perf_dump.h5 | grep "Runtime"
+          rm perf_dump.h5
+          cd ..

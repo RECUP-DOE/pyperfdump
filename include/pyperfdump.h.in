@@ -1,0 +1,40 @@
+#ifndef PYPERFDUMP_H_
+#define PYPERFDUMP_H_
+
+#include <unordered_map>
+#include "papi_utils.h"
+
+#cmakedefine USE_MPI
+#cmakedefine ENABLE_HDF5
+#ifdef USE_MPI
+  #include <mpi.h>
+  #define PD_ABORT MPI_Abort(MPI_COMM_WORLD, 1)
+#else
+  #define PD_ABORT std::exit(1)
+#endif
+
+#define PD_ASSERT(condition, fmt, ...)                            \
+  do {                                                            \
+    if (!(condition)) {                                           \
+      std::fprintf(stderr, "%s:%d: PyPerfDump ERROR: " fmt "\n",  \
+                    __FILE__, __LINE__, __VA_ARGS__);             \
+      PD_ABORT;                                                   \
+    }                                                             \
+  }while(false)
+
+void dumpcsv(const int rank, const int num_procs,
+              const char *const filename,
+              const char *const region_name,
+              const PAPIEventSet *const event_set,
+              std::unordered_map<std::string,unsigned long long> &buffer,
+              const double runtime);
+#ifdef ENABLE_HDF5
+  void dumphdf5(const int rank, const int num_procs,
+                const char *const filename,
+                const char *const region_name,
+                const PAPIEventSet *const event_set,
+                std::unordered_map<std::string,unsigned long long> &buffer,
+                const double runtime);
+#endif
+
+#endif //PYPERFDUMP_H_
