@@ -23,20 +23,27 @@ Module Variants
 
 **NOTE:** *MPI variants additionally require mpi4py*
 
-Building
+Building and Installation
 ---
+To install within a virtualenv or conda environment,
+ensure the environment is activated before running `cmake`.
+
 The library can be built with CMake:
 ```bash
 $ mkdir build && cd build/
 $ cmake ..
 $ make
 ```
-The Python module will be created in the root folder of this project:
-`./pyperfdump.so`
+The Python module can be located in ./build/src/.
 
-Either add this directory to `PYTHONPATH`, i.e.,
-`export PYTHONPATH="$(pwd):$PYTHONPATH"`,
-or move `pyperfdump.so` into a location which will be found by Python
+Either manually add this file to a location within `PYTHONPATH`,
+or complete installation:
+```bash
+$ make install
+```
+
+`make install` will move `pyperfdump.so` into the system (or environment)
+Python site-library directory.
 
 CMake Module Variant Options
 ---

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12.0)
+cmake_minimum_required(VERSION 3.15.0)
 
 # Project information
 set(PROJECT_NAME PyPerfDump)
@@ -18,6 +18,7 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Find the dependencies, PAPI and Python+development are hard requirements
+set(Python_FIND_VIRTUALENV FIRST)
 find_package(PAPI REQUIRED)
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 
@@ -74,8 +75,7 @@ configure_file(src/perf_dump.cpp.in
 configure_file(src/dump_functions.cpp.in
                 ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_functions.cpp)
 
-# Output directory
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
 # The source of the package
 add_subdirectory(src)
+
+install(TARGETS pyperfdump DESTINATION ${Python_SITELIB})

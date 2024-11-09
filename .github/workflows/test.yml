@@ -24,10 +24,10 @@ jobs:
                            libhdf5-dev hdf5-tools
       - name: Build+Test for non-MPI with HDF5 disabled
         run: |
-          export PYTHONPATH="$(pwd):$PYTHONPATH"
           mkdir build && cd build
           cmake -DUSE_MPI=false -DENABLE_HDF5=false ..
           make
+          sudo make install
           rm -rf *
           cd ../test
           source env.sh
@@ -37,10 +37,10 @@ jobs:
           cd ..
       - name: Build+Test for non-MPI with HDF5 enabled
         run: |
-          export PYTHONPATH="$(pwd):$PYTHONPATH"
           cd build
           cmake -DUSE_MPI=false -DENABLE_HDF5=true ..
           make
+          sudo make install
           rm -rf *
           cd ../test
           source env.sh
@@ -61,10 +61,10 @@ jobs:
       - name: Build+Test for MPI with HDF5 disabled
         run: |
           export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
-          export PYTHONPATH="$(pwd):$PYTHONPATH"
           cd build
           cmake -DENABLE_HDF5=false ..
           make
+          sudo make install
           rm -rf *
           cd ../test
           source env.sh
@@ -75,12 +75,12 @@ jobs:
       - name: Build+Test for MPI with HDF5 enabled
         run: |
           export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
-          export PYTHONPATH="$(pwd):$PYTHONPATH"
           cd build
           HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
           export HDF5_ROOT
           cmake ..
           make
+          sudo make install
           rm -rf *
           cd ../test
           source env.sh
