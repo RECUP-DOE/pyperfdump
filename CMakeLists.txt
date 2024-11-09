@@ -78,4 +78,13 @@ configure_file(src/dump_functions.cpp.in
 # The source of the package
 add_subdirectory(src)
 
-install(TARGETS pyperfdump DESTINATION ${Python_SITELIB})
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  install(TARGETS pyperfdump DESTINATION ${Python_SITELIB})
+  message("The prefix is default: " ${CMAKE_INSTALL_PREFIX})
+else()
+  set(SITELIB "${CMAKE_INSTALL_PREFIX}/lib/python")
+  set(SITELIB "${SITELIB}${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
+  set(SITELIB "${SITELIB}/site-packages/")
+  install(TARGETS pyperfdump DESTINATION ${SITELIB})
+  message("Installing to: " ${SITELIB})
+endif()
