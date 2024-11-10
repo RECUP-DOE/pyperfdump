@@ -23,8 +23,6 @@
 #include <unordered_map>
 #include "papi_utils.h"
 
-#cmakedefine USE_MPI
-#cmakedefine ENABLE_HDF5
 #ifdef USE_MPI
   #include <mpi.h>
   #define PD_ABORT MPI_Abort(MPI_COMM_WORLD, 1)

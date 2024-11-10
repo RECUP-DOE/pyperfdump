@@ -27,19 +27,6 @@
 #include <unordered_map>
 #include <vector>
 
-// whether to use MPI, requires MPI and Python's mpi4py
-#cmakedefine USE_MPI
-// whether to use HDF5, requires HDF5 for non-MPI or PHDF5 if using MPI
-#cmakedefine ENABLE_HDF5
-// whether to decrement Py_RETURN_NONE objects' ref counters
-// some calls are made to, e.g., break_state(), ignoring the return value
-// (we get a Python None object back but aren't using it)
-// these objects (prior to Python3.12) have had their ref counter incremented
-// If DECREFNONE is set, we will receive the None object and dec the ref
-#cmakedefine DECREFNONE
-// whether to silence warnings from break_state
-#cmakedefine SILENCE_WARNINGS
-
 #ifdef USE_MPI
   #include <mpi.h>
 #else

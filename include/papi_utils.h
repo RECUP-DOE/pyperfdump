@@ -35,7 +35,7 @@
 #include <string>
 #include <iostream>
 #include "papi.h"
-#cmakedefine USE_MPI
+
 #ifdef USE_MPI
   #include <mpi.h>
   #define PAPI_ABORT MPI_Abort(MPI_COMM_WORLD, 1)

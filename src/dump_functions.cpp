@@ -24,9 +24,6 @@
 #include "papi_utils.h"
 #include "pyperfdump.h"
 
-#cmakedefine USE_MPI
-#cmakedefine ENABLE_HDF5
-
 #ifdef USE_MPI
   #include <cstdio>
   #include <cstdlib>

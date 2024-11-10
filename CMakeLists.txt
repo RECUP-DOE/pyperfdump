@@ -25,6 +25,9 @@ find_package(Python COMPONENTS Interpreter Development REQUIRED)
 # An option to silence the break_state function warnings
 # these warnings are only encountered during improper API usage
 option(SILENCE_WARNINGS OFF)
+if (SILENCE_WARNINGS)
+  add_compile_definitions("SILENCE_WARNINGS")
+endif()
 
 # The Py_None object was made immortal (no ref count) in 3.12
 # Python < 3.12 increments the None counter in the macro Py_RETURN_NONE
@@ -65,15 +68,6 @@ if (ENABLE_HDF5)
     set(ENABLE_HDF5 OFF)
   endif()
 endif()
-
-configure_file(include/papi_utils.h.in
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/papi_utils.h)
-configure_file(include/pyperfdump.h.in
-                ${CMAKE_CURRENT_SOURCE_DIR}/include/pyperfdump.h)
-configure_file(src/perf_dump.cpp.in
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/perf_dump.cpp)
-configure_file(src/dump_functions.cpp.in
-                ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_functions.cpp)
 
 # The source of the package
 add_subdirectory(src)
