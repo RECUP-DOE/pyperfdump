@@ -211,7 +211,8 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       if (*env_str == '\0') break;
     }
     // we have exactly 1 name to add here
-    env_event_names.push_back(std::string(env_str));
+    if (*env_str != '\0')
+      env_event_names.push_back(std::string(env_str));
     // if we couldn't add any event from these names break and raise error
     if (event_set->add_from_names(env_event_names) == 0)
       return break_state("No valid event in PDUMP_EVENTS", true);
@@ -232,7 +233,8 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       if (*env_str == '\0') break;
     }
     // we have exactly 1 code to add here
-    env_event_codes.push_back(atoi(env_str));
+    if (*env_str != '\0')
+      env_event_codes.push_back(atoi(env_str));
     // if we couldn't add any event from these codes break and raise error
     if (event_set->add_from_codes(env_event_codes) == 0)
       return break_state("No valid code in PDUMP_CODES", true);
