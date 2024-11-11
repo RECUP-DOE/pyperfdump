@@ -19,10 +19,10 @@ $ spack install
 The Variants
 ---
 This package has 2 variant options, resulting in 4 combinations:
-- Using MPI with HDF5 enabled: `pyperfdump+mpi+hdf5` (default)
-- Using MPI without HDF5: `pyperfdump+mpi~hdf5`
-- No MPI with HDF5 enabled: `pyperfdump~mpi+hdf5`
-- No MPI and no HDF5: `pyperfdump~mpi~hdf5`
+- Using MPI with HDF5 enabled: `py-perfdump+mpi+hdf5` (default)
+- Using MPI without HDF5: `py-perfdump+mpi~hdf5`
+- No MPI with HDF5 enabled: `py-perfdump~mpi+hdf5`
+- No MPI and no HDF5: `py-perfdump~mpi~hdf5`
 
 More Verbose Setup Procedure Using an Environment
 ---
