@@ -1,5 +1,6 @@
 name: ubuntu-latest test
 on:
+  workflow_dispatch: {}
   push:
     branches:
       - 'main'

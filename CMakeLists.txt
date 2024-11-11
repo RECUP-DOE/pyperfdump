@@ -78,6 +78,7 @@ if (ENABLE_HDF5)
   else()
     add_compile_definitions("ENABLE_HDF5")
     set(TARGET_INCLUDE_DIRS ${TARGET_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+    set(TARGET_LINK_LIBS ${TARGET_LINK_LIBS} ${HDF5_LIBRARIES})
   endif()
 endif()
 
