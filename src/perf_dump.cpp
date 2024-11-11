@@ -195,20 +195,19 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   // char pointer for getenv
   char *env_str;
   // get counters by name with PDUMP_EVENTS
-  if ((env_str = std::getenv("PDUMP_EVENTS"))) {
+  if ((env_str = std::getenv("PDUMP_EVENTS")) && *env_str != '\0') {
     std::vector<std::string> env_event_names;
     // allow for either custom- comma- or colon- separated list
     char *next = std::getenv("PDUMP_DELIMITER");
     const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
     // while we found a delimiter, trim words from the front
-    while ((next=strchr(env_str, separator))) {
+    while (*env_str != '\0' && (next=strchr(env_str, separator))) {
       // set the delimiter to null
       *next = '\0';
       // add the next name
       env_event_names.push_back(std::string(env_str));
       // put the string start at the delimiter + 1
       env_str = next+1;
-      if (*env_str == '\0') break;
     }
     // we have exactly 1 name to add here
     if (*env_str != '\0')
@@ -218,19 +217,18 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       return break_state("No valid event in PDUMP_EVENTS", true);
   }
   // or get counters by value with PDUMP_CODES
-  else if ((env_str = std::getenv("PDUMP_CODES"))) {
+  else if ((env_str = std::getenv("PDUMP_CODES")) && *env_str != '\0') {
     std::vector<int> env_event_codes;
     // allow for either custom- comma- or colon- separated list
     char *next = std::getenv("PDUMP_DELIMITER");
     const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
     // while we found a delimiter, trim words from the front
-    while ((next=strchr(env_str, separator))) {
+    while (*env_str != '\0' && (next=strchr(env_str, separator))) {
       *next = '\0';
       // add the next code
       env_event_codes.push_back(atoi(env_str));
       // put the string start at delimiter + 1
       env_str = next+1;
-      if (*env_str == '\0') break;
     }
     // we have exactly 1 code to add here
     if (*env_str != '\0')
@@ -243,7 +241,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   else
     return break_state("Neither PDUMP_EVENTS nor PDUMP_CODES is set", true);
   // setup our output filename, begin with the directory
-  if ((env_str=std::getenv("PDUMP_DUMP_DIR"))) {
+  if ((env_str = std::getenv("PDUMP_DUMP_DIR")) && *env_str != '\0') {
     filename = std::string(env_str);
     // ensure a trailing path separator
     if (env_str[strlen(env_str)-1] != '/')
@@ -251,7 +249,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   }
   else
     filename = "./";
-  if ((env_str=std::getenv("PDUMP_FILENAME")))
+  if ((env_str = std::getenv("PDUMP_FILENAME")) && *env_str != '\0')
     filename += std::string(env_str);
   else
     filename += "perf_dump";
