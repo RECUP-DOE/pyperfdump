@@ -197,9 +197,9 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   // get counters by name with PDUMP_EVENTS
   if ((env_str = std::getenv("PDUMP_EVENTS"))) {
     std::vector<std::string> env_event_names;
-    // allow for either comma- or colon- separated list
-    char *next = strchr(env_str, ',');
-    const char separator = (next)? ',' : ':';
+    // allow for either custom- comma- or colon- separated list
+    char *next = std::getenv("PDUMP_DELIMITER");
+    const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
     // while we found a delimiter, trim words from the front
     while ((next=strchr(env_str, separator))) {
       // set the delimiter to null
@@ -218,9 +218,9 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   // or get counters by value with PDUMP_CODES
   else if ((env_str = std::getenv("PDUMP_CODES"))) {
     std::vector<int> env_event_codes;
-    // allow for either comma- or colon- separated list
-    char *next = strchr(env_str, ',');
-    const char separator = (next)? ',' : ':';
+    // allow for either custom- comma- or colon- separated list
+    char *next = std::getenv("PDUMP_DELIMITER");
+    const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
     // while we found a delimiter, trim words from the front
     while ((next=strchr(env_str, separator))) {
       *next = '\0';

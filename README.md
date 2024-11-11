@@ -130,10 +130,12 @@ pyperfdump.finalize()
 Environment Variables
 ---
 *PyPerfDump* uses environment variables for runtime configuration:
+- `PDUMP_DELIMITER`:
+Delimiter between PAPI counter names or codes, default: 1) comma or 2) colon
 - `PDUMP_EVENTS`:
-A comma or colon separated list of PAPI counters by name
+A delimiter separated list of PAPI counters by name
 - `PDUMP_CODES`:
-A comma or colon separated list of PAPI counters by numeric code
+A delimiter separated list of PAPI counters by numeric code
 - `PDUMP_DUMP_DIR`:
 The output directory for the dump file, defaults to `./`
 - `PDUMP_FILENAME`:
