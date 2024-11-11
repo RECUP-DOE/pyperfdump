@@ -208,6 +208,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       env_event_names.push_back(std::string(env_str));
       // put the string start at the delimiter + 1
       env_str = next+1;
+      if (*env_str == '\0') break;
     }
     // we have exactly 1 name to add here
     env_event_names.push_back(std::string(env_str));
@@ -228,6 +229,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       env_event_codes.push_back(atoi(env_str));
       // put the string start at delimiter + 1
       env_str = next+1;
+      if (*env_str == '\0') break;
     }
     // we have exactly 1 code to add here
     env_event_codes.push_back(atoi(env_str));
