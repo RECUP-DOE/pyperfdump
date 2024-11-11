@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15.0)
 set(PROJECT_NAME PyPerfDump)
 project(
   ${PROJECT_NAME}
-  VERSION 0.1
+  VERSION 1.0
   DESCRIPTION "Python Performance Dump module for PAPI")
 
 set(CMAKE_CXX_STANDARD 11)
@@ -39,7 +39,7 @@ endif()
 # The return value is ignored sometimes (shouldn't be incremented)
 # Let's set a flag to turn on a define to handle that here
 if (Python_VERSION_MAJOR LESS 3 OR Python_VERSION_MINOR LESS 12)
-  set(DECREFNONE ON)
+  add_compile_definitions("DECREFNONE")
 endif()
 
 # We will use MPI for parallel output, changes default behavior to use MPI
