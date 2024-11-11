@@ -7,6 +7,8 @@ project(
   VERSION 0.1
   DESCRIPTION "Python Performance Dump module for PAPI")
 
+set(CMAKE_CXX_STANDARD 11)
+
 # Set to build-type to release by default
 if (NOT EXISTS ${CMAKE_BINARY_DIR}/CMakeCache.txt)
   if (NOT CMAKE_BUILD_TYPE)
@@ -18,9 +20,12 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Find the dependencies, PAPI and Python+development are hard requirements
-set(Python_FIND_VIRTUALENV FIRST)
 find_package(PAPI REQUIRED)
+set(TARGET_LINK_LIBS ${PAPI_LIBRARIES})
+
+set(Python_FIND_VIRTUALENV FIRST)
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
+set(TARGET_INCLUDE_DIRS ${Python_INCLUDE_DIRS} ../include)
 
 # An option to silence the break_state function warnings
 # these warnings are only encountered during improper API usage
@@ -45,6 +50,10 @@ if (USE_MPI)
   if (NOT MPI_CXX_FOUND)
     message("MPI was not found, disabling MPI")
     set(USE_MPI OFF)
+  else()
+    add_compile_definitions("USE_MPI")
+    set(TARGET_INCLUDE_DIRS ${TARGET_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_DIRS})
+    set(TARGET_LINK_LIBS ${TARGET_LINK_LIBS} ${MPI_CXX_LIBRARIES})
   endif()
 endif()
 
@@ -66,6 +75,9 @@ if (ENABLE_HDF5)
   elseif (NOT USE_MPI AND HDF5_IS_PARALLEL)
     message("Found parallel HDF5 which requires MPI, disabling HDF5")
     set(ENABLE_HDF5 OFF)
+  else()
+    add_compile_definitions("ENABLE_HDF5")
+    set(TARGET_INCLUDE_DIRS ${TARGET_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
   endif()
 endif()
 
@@ -73,10 +85,12 @@ endif()
 add_subdirectory(src)
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  install(TARGETS pyperfdump DESTINATION ${Python_SITELIB})
+  #if (IS_DIRECTORY $ENV{PYTHONPATH})
+  #  set(SITELIB $ENV{PYTHONPATH})
+  set(SITELIB "${Python_SITELIB}")
 else()
   set(SITELIB "${CMAKE_INSTALL_PREFIX}/lib/python")
   set(SITELIB "${SITELIB}${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
   set(SITELIB "${SITELIB}/site-packages/")
-  install(TARGETS pyperfdump DESTINATION ${SITELIB})
 endif()
+install(TARGETS pyperfdump DESTINATION ${SITELIB})
