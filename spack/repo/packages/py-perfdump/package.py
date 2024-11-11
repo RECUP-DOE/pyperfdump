@@ -13,7 +13,7 @@ class PyPerfdump(CMakePackage):
 
     version(
         "1.0",
-        sha256="d8777787a8f8b650fc1d6cd8cea23fd1a0c203c6654466c8bb9d407f59766b24",
+        sha256="",
     )
 
     variant("mpi", default=True, description="Use MPI")
