@@ -6,7 +6,8 @@ on:
     paths:
       - '**.cpp'
       - '**.h'
-      - '**.in'
+    tags:
+      - '*'
 jobs:
   ubuntutest:
     runs-on: ubuntu-latest
