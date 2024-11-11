@@ -1,8 +1,7 @@
 PyPerfDump with Spack
 ---
 For information regarding installation and setup for Spack, visit:
-[their installation tutorial]
-(https://spack-tutorial.readthedocs.io/en/latest/tutorial_basics.html)
+[their installation tutorial](https://spack-tutorial.readthedocs.io/en/latest/tutorial_basics.html)
 
 Base Usage
 ---
