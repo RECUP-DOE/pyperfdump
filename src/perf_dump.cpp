@@ -197,9 +197,9 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   // get counters by name with PDUMP_EVENTS
   if ((env_str = std::getenv("PDUMP_EVENTS")) && *env_str != '\0') {
     std::vector<std::string> env_event_names;
-    // allow for either custom- comma- or colon- separated list
+    // allow for either user-defined or comma separated list
     char *next = std::getenv("PDUMP_DELIMITER");
-    const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
+    const char separator = (next)? *next : ',';
     // while we found a delimiter, trim words from the front
     while (*env_str != '\0' && (next=strchr(env_str, separator))) {
       // set the delimiter to null
@@ -209,7 +209,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       // put the string start at the delimiter + 1
       env_str = next+1;
     }
-    // we have exactly 1 name to add here
+    // we have exactly 1 name to add here or the list ended in a delimiter
     if (*env_str != '\0')
       env_event_names.push_back(std::string(env_str));
     // if we couldn't add any event from these names break and raise error
@@ -219,9 +219,9 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
   // or get counters by value with PDUMP_CODES
   else if ((env_str = std::getenv("PDUMP_CODES")) && *env_str != '\0') {
     std::vector<int> env_event_codes;
-    // allow for either custom- comma- or colon- separated list
+    // allow for either user-defined or comma separated list
     char *next = std::getenv("PDUMP_DELIMITER");
-    const char separator = (next)? *next : (strchr(env_str, ','))? ',' : ':';
+    const char separator = (next)? *next : ',';
     // while we found a delimiter, trim words from the front
     while (*env_str != '\0' && (next=strchr(env_str, separator))) {
       *next = '\0';
@@ -230,7 +230,7 @@ static PyObject *method_init(PyObject *self,PyObject *args) {
       // put the string start at delimiter + 1
       env_str = next+1;
     }
-    // we have exactly 1 code to add here
+    // we have exactly 1 name to add here or the list ended in a delimiter
     if (*env_str != '\0')
       env_event_codes.push_back(atoi(env_str));
     // if we couldn't add any event from these codes break and raise error
