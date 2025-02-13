@@ -14,9 +14,9 @@ except Exception as e:
 
 import pyperfdump, sys
 
-# debugmsg can be swapped if messages regarding script status were desired
-debugmsg = lambda *args, **kwargs: None
-#debugmsg = lambda *args, **kwargs: print(*args, **kwargs)
+# debugmsg can be swapped to optionally silence script messages
+#debugmsg = lambda *args, **kwargs: None
+debugmsg = lambda *args, **kwargs: print(*args, **kwargs)
 
 # A small loop that will take a small amount of time
 def run():
