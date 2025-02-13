@@ -5,15 +5,15 @@ class PyPerfdump(CMakePackage):
 
     homepage = "https://github.com/RECUP-DOE/pyperfdump/"
     git = "https://github.com/RECUP-DOE/pyperfdump.git"
-    url = "https://github.com/RECUP-DOE/pyperfdump/archive/refs/tags/v1.0.tar.gz"
+    url = "https://github.com/RECUP-DOE/pyperfdump/archive/refs/tags/v1.1.tar.gz"
 
     maintainers("chaseleif")
 
     license("Apache-2.0 WITH LLVM-Exception", checked_by="chaseleif")
 
     version(
-        "1.0",
-        sha256="ff7e27546d1e03fb932ed5489829878366f3f0b44ad32136fded94f07096dfe6",
+        "1.1",
+        sha256="d2d96e2bd8ba2616ea4a44233ea240a529788390a5c22d35f9de79a22647370d",
     )
 
     variant("mpi", default=True, description="Use MPI")
