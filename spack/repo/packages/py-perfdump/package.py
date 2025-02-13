@@ -9,7 +9,7 @@ class PyPerfdump(CMakePackage):
 
     maintainers("chaseleif")
 
-    license("GPL-3.0-or-later", checked_by="chaseleif")
+    license("Apache-2.0 WITH LLVM-Exception", checked_by="chaseleif")
 
     version(
         "1.0",
