@@ -24,74 +24,20 @@ jobs:
           sudo apt install build-essential python3-dev \
                            papi-tools libpapi-dev \
                            libhdf5-dev hdf5-tools
-      - name: Build+Test for non-MPI with HDF5 disabled
+      - name: Build+Test for non-MPI
         run: |
-          mkdir build && cd build
-          cmake -DUSE_MPI=false -DENABLE_HDF5=false ..
-          make
-          sudo make install
-          rm -rf *
-          cd ../test
-          source env.sh
-          python3 test.py
-          grep "Runtime" perf_dump.csv
-          rm perf_dump.csv
-          cd ..
-      - name: Build+Test for non-MPI with HDF5 enabled
-        run: |
-          cd build
-          cmake -DUSE_MPI=false -DENABLE_HDF5=true ..
-          make
-          sudo make install
-          rm -rf *
-          cd ../test
-          source env.sh
-          export PDUMP_OUTPUT_FORMAT=csv
-          python3 test.py
-          grep "Runtime" perf_dump.csv
-          rm perf_dump.csv
-          export PDUMP_OUTPUT_FORMAT=hdf5
-          python3 test.py
-          h5dump perf_dump.h5 | grep "Runtime"
-          rm perf_dump.h5
+          cd test
+          ./test.sh
           cd ..
       - name: Setup system for MPI tests
         run: |
           sudo apt purge libhdf5-dev hdf5-tools
           sudo apt install mpi-default-dev python3-mpi4py \
                            libhdf5-mpi-dev hdf5-tools
-      - name: Build+Test for MPI with HDF5 disabled
+      - name: Build+Test for MPI
         run: |
-          export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
-          cd build
-          cmake -DENABLE_HDF5=false ..
-          make
-          sudo make install
-          rm -rf *
-          cd ../test
-          source env.sh
-          mpiexec --oversubscribe -n 2 python3 test.py
-          grep "Runtime" perf_dump.csv
-          rm perf_dump.csv
-          cd ..
-      - name: Build+Test for MPI with HDF5 enabled
-        run: |
-          export PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
-          cd build
           HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
           export HDF5_ROOT
-          cmake ..
-          make
-          sudo make install
-          rm -rf *
-          cd ../test
-          source env.sh
-          export PDUMP_OUTPUT_FORMAT=csv
-          mpiexec --oversubscribe -n 2 python3 test.py
-          grep "Runtime" perf_dump.csv
-          rm perf_dump.csv
-          export PDUMP_OUTPUT_FORMAT=hdf5
-          mpiexec --oversubscribe -n 2 python3 test.py
-          h5dump perf_dump.2.h5 | grep "Runtime"
-          rm perf_dump.2.h5
+          cd test
+          ./test.sh
           cd ..

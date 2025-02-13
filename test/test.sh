@@ -45,7 +45,7 @@ users (without CAP_SYS_ADMIN).  The default value is 2.
 fi
 
 # Optional dependencies for variant features
-# The test.py script always tries to import mpi4py
+# The demo.py script always tries to import mpi4py
 # Use of HDF5 or PHDF5 depends on whether MPI is available
 python -c 'import mpi4py' 2>/dev/null
 havempi="$?"
@@ -83,10 +83,10 @@ export PDUMP_OUTPUT_FORMAT
 
 # run command and (possible) h5 output filename
 if [ "$havempi" -eq 0 ] ; then
-  cmd="mpiexec --oversubscribe -n 2 python3 ../test.py"
+  cmd="mpiexec --oversubscribe -n 2 python3 ../demo.py"
   h5file="perf_dump.2.h5"
 else
-  cmd="python3 ../test.py"
+  cmd="python3 ../demo.py"
   h5file="perf_dump.h5"
 fi
 # same csv output filename for with/out mpi
