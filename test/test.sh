@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-[ -n "$HDF5_ROOT" ] && echo "HDF5_ROOT=$HDF5_ROOT"
-
 # pyperfdump requires papi
 if ! which papi_avail >/dev/null 2>&1 ; then
   echo "PyPerfDump requires PAPI"

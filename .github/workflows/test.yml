@@ -36,6 +36,8 @@ jobs:
                            libhdf5-mpi-dev hdf5-tools
       - name: Build+Test for MPI
         run: |
+          PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
+          export PYTHONPATH
           HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
           export HDF5_ROOT
           cd test
