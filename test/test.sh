@@ -47,7 +47,7 @@ fi
 # Optional dependencies for variant features
 # The demo.py script always tries to import mpi4py
 # Use of HDF5 or PHDF5 depends on whether MPI is available
-python -c 'import mpi4py' 2>/dev/null
+mpiexec -n 1 python -c 'from mpi4py import MPI' 2>/dev/null
 havempi="$?"
 [ "$havempi" -eq 0 ] && usempi="ON" || usempi="OFF"
 # hdf5 check for the h5dump bin
@@ -92,7 +92,7 @@ if [ "$havempi" -eq 0 ] ; then
 else
   echo "###"
   echo -n "# Running test without MPI"
-  [ "$havehdf5" -eq 0 ] && echo " and HDF5" || echo ""
+  [ "$havehdf5" -eq 0 ] && echo " and with HDF5" || echo ""
   echo "###"
   cmd="python3 ../demo.py"
   h5file="perf_dump.h5"

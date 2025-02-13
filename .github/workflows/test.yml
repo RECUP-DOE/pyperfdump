@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup system for non-MPI tests
         run: |
           sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
@@ -32,13 +32,13 @@ jobs:
       - name: Setup system for MPI tests
         run: |
           sudo apt purge libhdf5-dev hdf5-tools
-          sudo apt install mpi-default-dev python3-mpi4py \
-                           libhdf5-mpi-dev hdf5-tools
+          sudo apt install openmpi-bin python3-mpi4py \
+                           libhdf5-openmpi-dev hdf5-tools
       - name: Build+Test for MPI
         run: |
           PYTHONPATH="/usr/lib/python3/dist-packages:$PYTHONPATH"
           export PYTHONPATH
-          HDF5_ROOT=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
+          HDF5_ROOT="/usr/lib/x86_64-linux-gnu/hdf5/openmpi"
           export HDF5_ROOT
           cd test
           ./test.sh
