@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+[ -n "$HDF5_ROOT" ] && echo "HDF5_ROOT=$HDF5_ROOT"
+
 # pyperfdump requires papi
 if ! which papi_avail >/dev/null 2>&1 ; then
   echo "PyPerfDump requires PAPI"
@@ -58,13 +60,13 @@ havehdf5="$?"
 # fresh build directory
 set -e
 rm -rf build/ && mkdir build && cd build
+set +e
 cmake "-DCMAKE_INSTALL_PREFIX=$(pwd)/install" \
       "-DUSE_MPI:BOOL=$usempi" \
       "-DENABLE_HDF5:BOOL=$enablehdf5" \
       "../../"
 make
 make install
-set +e
 
 # the location built pyperfdump.so file
 # (could just use pwd/src, doing an install will put it in python path)
@@ -83,9 +85,17 @@ export PDUMP_OUTPUT_FORMAT
 
 # run command and (possible) h5 output filename
 if [ "$havempi" -eq 0 ] ; then
+  echo "###"
+  echo -n "# Running test with MPI"
+  [ "$havehdf5" -eq 0 ] && echo " and PHDF5" || echo ""
+  echo "###"
   cmd="mpiexec --oversubscribe -n 2 python3 ../demo.py"
   h5file="perf_dump.2.h5"
 else
+  echo "###"
+  echo -n "# Running test without MPI"
+  [ "$havehdf5" -eq 0 ] && echo " and HDF5" || echo ""
+  echo "###"
   cmd="python3 ../demo.py"
   h5file="perf_dump.h5"
 fi
@@ -99,6 +109,7 @@ $cmd
 if [ "$havehdf5" -eq 0 ] ; then
   if [ ! -f "$h5file" ] ; then
     echo "Expected HDF5 output file not found"
+    ls
   elif [ ! -s "$h5file" ] ; then
     echo "HDF5 output file is empty"
   elif ! h5dump "$h5file" | grep -q "Runtime" ; then
