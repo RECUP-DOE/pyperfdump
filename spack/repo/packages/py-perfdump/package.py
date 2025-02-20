@@ -1,4 +1,9 @@
+# Copyright Spack Project Developers. See COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (Apache-2.0 OR MIT)
+
 from spack.package import *
+
 
 class PyPerfdump(CMakePackage):
     """An MPI- and HDF5- enabled Python module to create PAPI dumps"""
@@ -11,10 +16,7 @@ class PyPerfdump(CMakePackage):
 
     license("Apache-2.0 WITH LLVM-Exception", checked_by="chaseleif")
 
-    version(
-        "1.1",
-        sha256="d2d96e2bd8ba2616ea4a44233ea240a529788390a5c22d35f9de79a22647370d",
-    )
+    version("1.1", sha256="d2d96e2bd8ba2616ea4a44233ea240a529788390a5c22d35f9de79a22647370d")
 
     variant("mpi", default=True, description="Use MPI")
     variant("hdf5", default=True, description="Enable HDF5 output")
