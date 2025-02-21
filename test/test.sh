@@ -96,7 +96,7 @@ else
   cmd="python3 ../demo.py"
   h5file="perf_dump.h5"
 fi
-[ -n "$h5file" ] && [ -f "$h5file" ] && rm "$h5file"
+[ -f "$h5file" ] && rm "$h5file"
 # same csv output filename for with/out mpi
 csvfile="perf_dump.csv"
 [ -f "$csvfile" ] && rm "$csvfile"
