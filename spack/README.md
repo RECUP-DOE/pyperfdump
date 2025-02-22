@@ -18,10 +18,10 @@ $ spack install
 The Variants
 ---
 This package has 2 variant options, resulting in 4 combinations:
-- Using MPI with HDF5 enabled: `py-perfdump+mpi+hdf5` (default)
+- Using MPI with HDF5 enabled: `py-perfdump+mpi+hdf5`
 - Using MPI without HDF5: `py-perfdump+mpi~hdf5`
 - No MPI with HDF5 enabled: `py-perfdump~mpi+hdf5`
-- No MPI and no HDF5: `py-perfdump~mpi~hdf5`
+- No MPI and no HDF5: `py-perfdump~mpi~hdf5` (default)
 
 More Verbose Setup Procedure Using an Environment
 ---
@@ -48,11 +48,7 @@ $ spack install
 4) Test the environment
 ```bash
 $ cd ../test
-$ ./env.sh || echo "Setting up required environment variables will fail"
-$ source ./env.sh
-$ #mpiexec -n 2 python test.py
-$ python test.py
+$ ./test.sh
 ```
-- If you use an MPI variant, you can use mpiexec/mpirun.
-- If HDF5 is enabled, you will have an HDF5 file output
-- If HDF5 is enabled, you set `PDUMP_OUTPUT_FORMAT` to csv for a csv output
+- If you use an MPI variant, you should use mpiexec/mpirun.
+- If HDF5 is enabled, set `PDUMP_OUTPUT_FORMAT` to csv for a csv output
