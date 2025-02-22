@@ -48,8 +48,8 @@ Python site-library directory.
 CMake Module Variant Options
 ---
 CMake will attempt to automatically detect MPI and HDF5.
-`USE_MPI` and `ENABLE_HDF5` are both enabled by default,
-though will be disabled if support is not found for these features.
+`USE_MPI` and `ENABLE_HDF5` are both disabled by default,
+and can only be enabled if support is found for these features.
 
 Configuration occurs in this order:
 - If `USE_MPI` is true, and MPI is not found, `USE_MPI` will be false.
@@ -66,7 +66,7 @@ so the option is to `USE_MPI`.
 Enabling HDF5 does not preclude generation of csv outputs,
 so the option is to `ENABLE_HDF5`.
 
-To disable options, modify the CMake command, e.g, `cmake -DUSE_MPI=false ..`
+To enable options, modify the CMake command, e.g, `cmake -DUSE_MPI:BOOL=ON ..`
 
 Additional CMake Variables
 ---

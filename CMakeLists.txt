@@ -44,7 +44,7 @@ endif()
 
 # We will use MPI for parallel output, changes default behavior to use MPI
 # MPI_Init and MPI_Finalize are not called, but other MPI functions will be
-option(USE_MPI "Use MPI" ON)
+option(USE_MPI "Use MPI" OFF)
 if (USE_MPI)
   find_package(MPI)
   if (NOT MPI_CXX_FOUND)
@@ -59,7 +59,7 @@ endif()
 
 # We can create HDF5 output, will still be optional
 # If also using MPI, this requires HDF5 to actually be PHDF5
-option(ENABLE_HDF5 "Enable HDF5 output" ON)
+option(ENABLE_HDF5 "Enable HDF5 output" OFF)
 if (ENABLE_HDF5)
   set(HDF5_USE_STATIC_LIBRARIES OFF)
   if (USE_MPI)
