@@ -36,13 +36,13 @@ class PyPerfdump(CMakePackage):
         spec = self.spec
         args = [
             "-DCMAKE_INSTALL_RPATH={0}".format(spec.prefix.lib),
-            "-DUSE_MPI:BOOL={0}".format("ON" if "+mpi" in spec else "OFF"),
-            "-DENABLE_HDF5:BOOL={0}".format("ON" if "+hdf5" in spec else "OFF"),
+            self.define_from_variant("USE_MPI", "mpi"),
+            self.define_from_variant("ENABLE_HDF5", "hdf5"),
             "-DPython_ROOT_DIR={0}".format(spec["python"].prefix),
-            "-DPAPI_PREFIX={0}".format(spec["papi"].prefix),
+            self.define("PAPI_PREFIX", spec["papi"].prefix),
         ]
-        if "+mpi" in spec:
-            args.append("-DMPI_HOME={0}".format(spec["mpi"].prefix))
-        if "+hdf5" in spec:
-            args.append("-DHDF5_ROOT={0}".format(spec["hdf5"].prefix))
+        if spec.satisfies("+mpi"):
+            args.append(self.define("MPI_HOME", spec["mpi"].prefix))
+        if spec.satisfies("+hdf5"):
+            args.append(self.define("HDF5_ROOT", spec["hdf5"].prefix))
         return args
