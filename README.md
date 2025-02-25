@@ -9,10 +9,9 @@ by Todd Gamblin with modification by Tanzima Islam.
 
 Many changes were made to create this Python module.
 
-Requirements
+Requirements and Installation
 ---
-1) The Python development package, including, e.g., `Python.h`
-2) PAPI (The Performance Application Programming Interface)
+See `INSTALLATION.md` for information using either CMake or Spack.
 
 Module Variants
 ---
@@ -22,69 +21,6 @@ Module Variants
 4) With MPI and with parallel HDF5
 
 **NOTE:** *MPI variants additionally require mpi4py*
-
-Building and Installation
----
-To install within a virtualenv or conda environment,
-ensure the environment is activated before running `cmake`.
-
-The library can be built with CMake:
-```bash
-$ mkdir build && cd build/
-$ cmake ..
-$ make
-```
-The Python module can be located in ./build/src/.
-
-Either manually add this file to a location within `PYTHONPATH`,
-or complete installation:
-```bash
-$ make install
-```
-
-`make install` will move `pyperfdump.so` into the system (or environment)
-Python site-library directory.
-
-CMake Module Variant Options
----
-CMake will attempt to automatically detect MPI and HDF5.
-`USE_MPI` and `ENABLE_HDF5` are both disabled by default,
-and can only be enabled if support is found for these features.
-
-Configuration occurs in this order:
-- If `USE_MPI` is true, and MPI is not found, `USE_MPI` will be false.
-- If `ENABLE_HDF5` is true, and HDF5 is not found, `ENABLE_HDF5` will be false.
-- If `ENABLE_HDF5` and `USE_MPI` are true and the HDF5 found is not parallel,
-`ENABLE_HDF5` will be false.
-- If `ENABLE_HDF5` is true, `USE_MPI` is false, and the HDF5 found is parallel,
-`ENABLE_HDF5` will be false.
-
-*A message will be printed if an option is disabled by the above conditions.*
-
-Use of MPI changes multiple aspects within the module,
-so the option is to `USE_MPI`.
-Enabling HDF5 does not preclude generation of csv outputs,
-so the option is to `ENABLE_HDF5`.
-
-To enable options, modify the CMake command, e.g, `cmake -DUSE_MPI:BOOL=ON ..`
-
-Additional CMake Variables
----
-- `DECREFNONE` handles differing treatment of Python None objects
-and is *automatically* configured.
-- `SILENCE_WARNINGS` is by default false
-and can be enabled to suppress warnings for non-fatal out-of-order module usage.
-
-Build Issues
----
-If CMake is unable to locate a requirement, e.g., HDF5, it will accept hints:
-```bash
-$ Python_ROOT_DIR=/path/to/python3
-$ export Python_ROOT_DIR
-$ PAPI_PREFIX=/path/to/papi
-$ export PAPI_PREFIX
-$ cmake -DMPI_HOME=/path/to/mpi -DHDF5_ROOT=/path/to/hdf5 ..
-```
 
 Usage
 ---
@@ -127,6 +63,8 @@ pyperfdump.finalize()
 - With MPI *pyperfdump* methods should be called
 **collectively** by all processes.
 
+_See `test/demo.py` for an example._
+
 Environment Variables
 ---
 *PyPerfDump* uses environment variables for runtime configuration:
@@ -149,7 +87,7 @@ of ranks, e.g., `.2.h5`, to prevent dimension-related issues.
 
 Either `PDUMP_EVENTS` *or* `PDUMP_CODES`
 **must** be set prior to calling `pyperfdump.init()`.
-An exception will be raised if there no counters to collect.
+An exception will be raised if there are no counters to collect.
 
 A ***warning*** will be printed if a counter name or code cannot be used
 (with the reason why).
