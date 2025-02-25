@@ -1,8 +1,38 @@
 #! /usr/bin/env bash
 
-# pyperfdump requires papi
-if ! which papi_avail >/dev/null 2>&1 ; then
-  echo "PyPerfDump requires PAPI"
+echo "$0"
+
+# pyperfdump library not found in PYTHONPATH
+if ! python -c 'import pyperfdump' 2>/dev/null ; then
+  # Check if we've built a test library already
+  LIBPATH="$(find "build/install" -type f -name pyperfdump.so 2>/dev/null)"
+  # Indicate whether testing module found and offer to {Reb,B}uild
+  if [ -f "$LIBPATH" ] ; then
+    echo "PyPerfDump module built for testing found"
+    echo -n "Reb"
+  else
+    echo "PyPerfDump module not found"
+    echo -n "B"
+  fi
+  # The default choice is to rebuild or build PyPerfDump for testing
+  read -t 5 -p "uild PyPerfDump for testing (Y/n) " choice || echo ""
+  # Choosing "No" will quit the test if the module not previously built
+  if [[ "$choice" =~ [nN].* ]] ; then
+    [ ! -f "$LIBPATH" ] && exit 1
+  else
+    ./build.sh
+  fi
+  # Set the location of the built module
+  LIBPATH="$(pwd)/build/install/lib"
+  LIBPATH="${LIBPATH}/$(ls "$LIBPATH")/site-packages"
+  PYTHONPATH="$LIBPATH:$PYTHONPATH"
+  export PYTHONPATH
+fi
+if ! python -c 'import pyperfdump' 2>/dev/null ; then
+  # There is a problem with the path
+  echo "$ ls $LIBPATH"
+  ls "$LIBPATH"
+  echo "PyPerfDump module still not found"
   exit 1
 fi
 
@@ -20,7 +50,6 @@ for event in $PAPI_EVENTS ; do
   [ -n "$PDUMP_EVENTS" ] && PDUMP_EVENTS=",$PDUMP_EVENTS"
   PDUMP_EVENTS="$event$PDUMP_EVENTS"
 done
-
 # If no counters are found, or none of these work, then PAPI won't work
 if [ -z "$PDUMP_EVENTS" ] ; then
   echo "No possible PAPI counters found
@@ -44,33 +73,10 @@ users (without CAP_SYS_ADMIN).  The default value is 2.
   exit 1
 fi
 
-# Optional dependencies for variant features
-# The demo.py script always tries to import mpi4py
-# Use of HDF5 or PHDF5 depends on whether MPI is available
-mpiexec -n 1 python -c 'from mpi4py import MPI' 2>/dev/null
-havempi="$?"
-[ "$havempi" -eq 0 ] && usempi="ON" || usempi="OFF"
 # hdf5 check for the h5dump bin
 which h5dump >/dev/null 2>&1
 havehdf5="$?"
-[ "$havehdf5" -eq 0 ] && enablehdf5="ON" || enablehdf5="OFF"
 
-# fresh build directory
-[ -d "build/" ] && rm -rf build/
-mkdir build && cd build || exit 1
-cmake "-DCMAKE_INSTALL_PREFIX=$(pwd)/install" \
-      "-DUSE_MPI:BOOL=$usempi" \
-      "-DENABLE_HDF5:BOOL=$enablehdf5" \
-      "../../"
-make
-make install
-
-# the location built pyperfdump.so file
-# (could just use pwd/src, doing an install will put it in python path)
-LIBPATH="$(pwd)/install/lib"
-LIBPATH="${LIBPATH}/$(ls "$LIBPATH")/site-packages"
-PYTHONPATH="$LIBPATH:$PYTHONPATH"
-export PYTHONPATH
 # the path for the output dump file
 PDUMP_DUMP_DIR="$(pwd)"
 export PDUMP_DUMP_DIR
@@ -81,19 +87,19 @@ PDUMP_OUTPUT_FORMAT=hdf5
 export PDUMP_OUTPUT_FORMAT
 
 # run command and (possible) h5 output filename
-if [ "$havempi" -eq 0 ] ; then
+if mpiexec -n 1 python -c 'from mpi4py import MPI' 2>/dev/null ; then
   echo "###"
   echo -n "# Running test with MPI"
   [ "$havehdf5" -eq 0 ] && echo " and PHDF5" || echo ""
   echo "###"
-  cmd="mpiexec --oversubscribe -n 2 python3 ../demo.py"
+  cmd="mpiexec --oversubscribe -n 2 python3 demo.py"
   h5file="perf_dump.2.h5"
 else
   echo "###"
   echo -n "# Running test without MPI"
   [ "$havehdf5" -eq 0 ] && echo " and with HDF5" || echo ""
   echo "###"
-  cmd="python3 ../demo.py"
+  cmd="python3 demo.py"
   h5file="perf_dump.h5"
 fi
 [ -f "$h5file" ] && rm "$h5file"
@@ -102,30 +108,40 @@ csvfile="perf_dump.csv"
 [ -f "$csvfile" ] && rm "$csvfile"
 
 # run the test
+echo "$cmd"
 $cmd
 
 # we have an hdf5 output file
 if [ "$havehdf5" -eq 0 ] ; then
   if [ ! -f "$h5file" ] ; then
-    echo "Expected HDF5 output file not found"
-    ls
+    echo "No HDF5 output file"
+    havehdf5=1
   elif [ ! -s "$h5file" ] ; then
-    echo "HDF5 output file is empty"
+    echo "HDF5 output file is empty and shouldn't be"
   elif ! h5dump "$h5file" | grep -q "Runtime" ; then
     echo "HDF5 file output doesn't contain runtime and should"
   else
     echo "HDF5 output appears correct"
   fi
-  # Generate a csv output now
-  export PDUMP_OUTPUT_FORMAT=csv
-  $cmd
+  if [ "$havehdf5" -eq 0 ] ; then
+    # Generate a csv output now
+    export PDUMP_OUTPUT_FORMAT=csv
+    echo "$cmd"
+    $cmd
+  fi
 fi
-if ! grep -q "Runtime" "$csvfile" ; then
-  echo "csv output doesn't contain runtime and should"
+if [ ! -f "$csvfile" ] ; then
+  echo "No csv output file"
+  exit 1
+elif [ ! -s "$csvfile" ] ; then
+  echo "csv output file is empty and shouldn't be"
+  exit 1
+elif ! grep -q "Runtime" "$csvfile" ; then
+  echo "csv output doesn't contain Runtime and should"
   exit 1
 else
   echo "csv output appears correct"
 fi
 
-echo "Test complete"
+echo "Test successful"
 exit 0
