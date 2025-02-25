@@ -13,7 +13,7 @@ if ! python3 -c 'import pyperfdump' 2>/dev/null ; then
   # Check if we've built a test library already
   LIBPATH="$(find "build/install" -type f -name pyperfdump.so 2>/dev/null)"
   # Do not echo prompt in non-interactive shells, set choice=Y
-  if [[ $- =~ .*i.* ]] ; then
+  if [ ! -t 0 ] ; then
     echo "Building PyPerfDump module for test"
     choice="Y"
   # Indicate whether testing module found and offer to {Reb,B}uild
