@@ -2,13 +2,20 @@
 
 echo "$0"
 
+# pyperfdump requires papi
+if ! which papi_avail >/dev/null 2>&1 ; then
+  echo "PyPerfDump requires PAPI"
+  exit 1
+fi
+
 # pyperfdump library not found in PYTHONPATH
-if ! python -c 'import pyperfdump' 2>/dev/null ; then
+if ! python3 -c 'import pyperfdump' 2>/dev/null ; then
   # Check if we've built a test library already
   LIBPATH="$(find "build/install" -type f -name pyperfdump.so 2>/dev/null)"
-  # Do not echo prompt in non-interactive shells
-  if [[ $- != *i* ]] ; then
-    :
+  # Do not echo prompt in non-interactive shells, set choice=Y
+  if [[ $- =~ .*i.* ]] ; then
+    echo "Building PyPerfDump module for test"
+    choice="Y"
   # Indicate whether testing module found and offer to {Reb,B}uild
   elif [ -f "$LIBPATH" ] ; then
     echo "PyPerfDump module built for testing found"
@@ -31,7 +38,7 @@ if ! python -c 'import pyperfdump' 2>/dev/null ; then
   PYTHONPATH="$LIBPATH:$PYTHONPATH"
   export PYTHONPATH
 fi
-if ! python -c 'import pyperfdump' 2>/dev/null ; then
+if ! python3 -c 'import pyperfdump' 2>/dev/null ; then
   # There is a problem with the path
   echo "$ ls $LIBPATH"
   ls "$LIBPATH"
@@ -42,7 +49,7 @@ fi
 # In order for a test to succeed, we need at least 1 valid counter
 # To avoid arbitrarily selecting a counter that isn't available,
 # we will just list all potential counters as "selected" counters
-# a subset of valid counters will be automatically chosen
+# (a valid subset of counters will be automatically chosen)
 PAPI_EVENTS="$(papi_native_avail | grep "::" | awk '{print $2}')"
 for event in $PAPI_EVENTS ; do
   [ -n "$PDUMP_EVENTS" ] && PDUMP_EVENTS=",$PDUMP_EVENTS"
@@ -53,7 +60,7 @@ for event in $PAPI_EVENTS ; do
   [ -n "$PDUMP_EVENTS" ] && PDUMP_EVENTS=",$PDUMP_EVENTS"
   PDUMP_EVENTS="$event$PDUMP_EVENTS"
 done
-# If no counters are found, or none of these work, then PAPI won't work
+# If no counters are found then PAPI won't work
 if [ -z "$PDUMP_EVENTS" ] ; then
   echo "No possible PAPI counters found
 
@@ -76,21 +83,47 @@ users (without CAP_SYS_ADMIN).  The default value is 2.
   exit 1
 fi
 
-# hdf5 check for the h5dump bin
-which h5dump >/dev/null 2>&1
-havehdf5="$?"
-
-# the path for the output dump file
+# The path for the output dump file
 PDUMP_DUMP_DIR="$(pwd)"
 export PDUMP_DUMP_DIR
-# the PAPI events we found earlier, any in the list that work can be chosen
+# The PAPI events we found earlier, any in the list that work can be chosen
 export PDUMP_EVENTS
-# set output format to hdf5, if we don't have hdf5 support it will create a csv
+# Set output format to hdf5, if we don't have hdf5 support it will create a csv
 PDUMP_OUTPUT_FORMAT=hdf5
 export PDUMP_OUTPUT_FORMAT
 
-# run command and (possible) h5 output filename
-if mpiexec -n 1 python -c 'from mpi4py import MPI' 2>/dev/null ; then
+# Only check for hdf5 output if we have the h5dump command
+if which h5dump >/dev/null 2>&1 ; then
+  echo "h5dump command found"
+  havehdf5=0
+else
+  echo "h5dump command not found"
+  havehdf5=1
+fi
+
+# Determine whether PyPerfDump was built with MPI
+if python3 -c 'import pyperfdump ; pyperfdump.init()' 2>/dev/null ; then
+  echo "PyPerfDump built without MPI"
+  havempi=1
+else
+  echo "PyPerfDump built with MPI"
+  if which mpiexec >/dev/null 2>&1 ; then
+    echo "mpiexec command found"
+    if mpiexec -n 1 python3 -c 'from mpi4py import MPI' 2>/dev/null ; then
+      echo "mpi4py found"
+    else
+      echo "mpi4py not found"
+      exit 1
+    fi
+  else
+    echo "mpiexec command not found"
+    exit 1
+  fi
+  havempi=0
+fi
+
+# Get run command and output filenames
+if [ "$havempi" -eq 0 ] ; then
   echo "###"
   echo -n "# Running test with MPI"
   [ "$havehdf5" -eq 0 ] && echo " and PHDF5" || echo ""
@@ -105,24 +138,32 @@ else
   cmd="python3 demo.py"
   h5file="perf_dump.h5"
 fi
-[ -f "$h5file" ] && rm "$h5file"
-# same csv output filename for with/out mpi
+# It will be the same csv output filename with or without MPI
 csvfile="perf_dump.csv"
+# Ensure output files don't exist
+[ -f "$h5file" ] && rm "$h5file"
 [ -f "$csvfile" ] && rm "$csvfile"
 
-# run the test
+# Print the command and run the test
 echo "$cmd"
 $cmd
 
-# we have an hdf5 output file
+# If we could have an hdf5 output file
 if [ "$havehdf5" -eq 0 ] ; then
+  # There is no hdf5 file
   if [ ! -f "$h5file" ] ; then
-    echo "No HDF5 output file"
-    havehdf5=1
+    # the output was written to a csv file, pyperfdump was built without hdf5
+    if [ -f "$csvfile" ] ; then
+      echo "PyPerfDump built without HDF5"
+      havehdf5=1
+    else
+      echo "No HDF5 or csv output file"
+      exit 1
+    fi
   elif [ ! -s "$h5file" ] ; then
     echo "HDF5 output file is empty and shouldn't be"
   elif ! h5dump "$h5file" | grep -q "Runtime" ; then
-    echo "HDF5 file output doesn't contain runtime and should"
+    echo "HDF5 file output doesn't contain Runtime and should"
   else
     echo "HDF5 output appears correct"
   fi
@@ -133,6 +174,8 @@ if [ "$havehdf5" -eq 0 ] ; then
     $cmd
   fi
 fi
+
+# We should have a csv output file
 if [ ! -f "$csvfile" ] ; then
   echo "No csv output file"
   exit 1
