@@ -29,7 +29,7 @@ set(TARGET_INCLUDE_DIRS ${Python_INCLUDE_DIRS} ../include)
 
 # An option to silence the break_state function warnings
 # these warnings are only encountered during improper API usage
-option(SILENCE_WARNINGS OFF)
+option(SILENCE_WARNINGS "Silence warnings for out-of-order usage" OFF)
 if (SILENCE_WARNINGS)
   add_compile_definitions("SILENCE_WARNINGS")
 endif()
