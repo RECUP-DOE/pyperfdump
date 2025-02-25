@@ -6,8 +6,11 @@ echo "$0"
 if ! python -c 'import pyperfdump' 2>/dev/null ; then
   # Check if we've built a test library already
   LIBPATH="$(find "build/install" -type f -name pyperfdump.so 2>/dev/null)"
+  # Do not echo prompt in non-interactive shells
+  if [[ $- != *i* ]] ; then
+    :
   # Indicate whether testing module found and offer to {Reb,B}uild
-  if [ -f "$LIBPATH" ] ; then
+  elif [ -f "$LIBPATH" ] ; then
     echo "PyPerfDump module built for testing found"
     echo -n "Reb"
   else
@@ -15,7 +18,7 @@ if ! python -c 'import pyperfdump' 2>/dev/null ; then
     echo -n "B"
   fi
   # The default choice is to rebuild or build PyPerfDump for testing
-  read -t 5 -p "uild PyPerfDump for testing (Y/n) " choice || echo ""
+  read -t 5 -r -p "uild PyPerfDump for testing (Y/n) " choice || echo ""
   # Choosing "No" will quit the test if the module not previously built
   if [[ "$choice" =~ [nN].* ]] ; then
     [ ! -f "$LIBPATH" ] && exit 1
