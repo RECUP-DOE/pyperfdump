@@ -1,0 +1,12 @@
+option('use_mpi',
+  type: 'boolean',
+  value: false,
+  description: 'Use MPI')
+option('enable_hdf5',
+  type: 'boolean',
+  value: false,
+  description: 'Enable HDF5 output')
+option('silence_warnings',
+  type: 'boolean',
+  value: false,
+  description: 'Silence warnings for out-of-order usage')
