@@ -15,16 +15,15 @@ pyperfdump_sources = ['src/dump_functions.cpp',
                       'src/perf_dump.cpp']
 inc = include_directories('include')
 
-py_dep = dependency('python3', required: true)
 papi_dep = dependency('papi', required: true)
-deps = [py_dep, papi_dep]
+deps = [papi_dep]
 build_args = []
 
-py = import('python').find_installation('python3')
+module_deps = []
 
 if get_option('use_mpi')
   mpi_dep = dependency('mpi', language: 'cpp', required: true)
-  run_command(py, ['-c', 'import mpi4py'], check: true)
+  module_deps += 'mpi4py'
   deps += mpi_dep
   build_args += '-DUSE_MPI'
 endif
@@ -34,6 +33,7 @@ if get_option('enable_hdf5')
   build_args += '-DENABLE_HDF5'
 endif
 
+py = import('python').find_installation('python3', modules: module_deps)
 if py.language_version().version_compare('<3.12')
   build_args += '-DDECREFNONE'
 endif
@@ -47,7 +47,6 @@ py.extension_module(
   override_options: ['cython_language=cpp'],
   install: true,
   cpp_args: build_args,
-  gnu_symbol_visibility: 'hidden',
   include_directories: inc,
   dependencies: deps,
 )
