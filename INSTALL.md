@@ -1,13 +1,12 @@
 ## Install pyperfdump
-There are 2 methods available to install pyperfdump:
+There are 3 methods available to install pyperfdump:
 1) CMake
-2) Spack
+2) Meson
+3) Spack
 ___
 ### CMake
-This installation method requires external dependencies to be installed separately.
 
 Required dependencies:
-- CMake 3.15.0+
 - Python 3+
 - PAPI
 
@@ -47,8 +46,25 @@ MPI_HOME
 HDF5_ROOT
 ```
 ___
+### Meson
+
+Meson shares the same required and optional dependencies as CMake.
+
+Installation steps:
+```bash
+$ meson setup build && cd build/
+$ meson compile
+$ meson install
+```
+
+The `meson install` command will prefer a venv, similar to CMake.
+
+Options can be passed to meson during the setup phase, e.g.,
+```bash
+$ meson setup -Duse_mpi=true -Denable_hdf5=true build
+```
+___
 ### Spack
-This installation method will also install any required dependencies within the spack environment.
 
 Spack provides an [installation guide](https://spack-tutorial.readthedocs.io/en/latest/tutorial_basics.html).
 
