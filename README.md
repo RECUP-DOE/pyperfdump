@@ -11,7 +11,7 @@ Many changes were made to create this Python module.
 
 Requirements and Installation
 ---
-See `INSTALLATION.md` for information using either CMake or Spack.
+See `INSTALLATION.md` for information using CMake, Meson, or Spack.
 
 Module Variants
 ---
