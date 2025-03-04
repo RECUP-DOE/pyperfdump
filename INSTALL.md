@@ -4,7 +4,7 @@ There are 3 methods available to install pyperfdump:
 2) Meson
 3) Spack
 ___
-### CMake
+### Requirements
 
 Required dependencies:
 - Python 3+
@@ -17,6 +17,8 @@ Optional dependencies affect library usage and available output formats:
 - HDF5
   - Allows counter output in HDF5 format
   - When combined with MPI, HDF5 must be parallel HDF5
+___
+### CMake
 
 Installation steps:
 ```bash
@@ -48,8 +50,6 @@ HDF5_ROOT
 ___
 ### Meson
 
-Meson shares the same required and optional dependencies as CMake.
-
 Installation steps:
 ```bash
 $ meson setup build && cd build/
@@ -68,7 +68,7 @@ ___
 
 Spack provides an [installation guide](https://spack-tutorial.readthedocs.io/en/latest/tutorial_basics.html).
 
-This package is in the current development branch (not the current latest tag: v0.23.1).
+This package is in the current development branch (not the current latest tag: v0.23.1). The next Spack release (which this package will be included in) will likely include packages in a separate repository.
 
 Basic spack installation directions:
 ```bash
