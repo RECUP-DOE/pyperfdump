@@ -19,7 +19,7 @@ jobs:
           python-version: '3.12'
       - name: Setup system for non-MPI tests
         run: |
-          sudo sh -c 'echo -1 >/proc/sys/kernel/perf_event_paranoid'
+          sudo sysctl kernel.perf_event_paranoid=-1
           sudo apt update
           sudo apt install build-essential python3-dev \
                            papi-tools libpapi-dev \

@@ -41,6 +41,10 @@ endif()
 if (Python_VERSION_MAJOR LESS 3 OR Python_VERSION_MINOR LESS 12)
   add_compile_definitions("DECREFNONE")
 endif()
+# PyModule_AddObjectRef was added to the stable ABI in 3.10
+if (Python_VERSION_MAJOR LESS 3 OR Python_VERSION_MINOR LESS 10)
+  add_compile_definitions("PY_VERSION_LESS_3_10")
+endif()
 
 # We will use MPI for parallel output, changes default behavior to use MPI
 # MPI_Init and MPI_Finalize are not called, but other MPI functions will be

@@ -131,11 +131,13 @@ PyMODINIT_FUNC PyInit_pyperfdump(void) {
   PyObject *m = PyModule_Create(&pyperfdumpmodule);
   if (m == NULL) return NULL;
   PyPerfDumpError = PyErr_NewException("pyperfdump.error", NULL, NULL);
+#ifndef PY_VERSION_LESS_3_10
   if (PyModule_AddObjectRef(m, "error", PyPerfDumpError) < 0) {
     Py_CLEAR(PyPerfDumpError);
     Py_DECREF(m);
     return NULL;
   }
+#endif // PyModule_AddObjectRef added in stable ABI 3.10
   return m;
 }
 
