@@ -20,12 +20,13 @@ endif()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Find the dependencies, PAPI and Python+development are hard requirements
-find_package(PAPI REQUIRED)
-set(TARGET_LINK_LIBS ${PAPI_LIBRARIES})
-
 set(Python_FIND_VIRTUALENV FIRST)
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
 set(TARGET_INCLUDE_DIRS ${Python_INCLUDE_DIRS} ../include)
+
+find_package(PAPI REQUIRED)
+set(TARGET_INCLUDE_DIRS ${TARGET_INCLUDE_DIRS} ${PAPI_INCLUDE_DIRS})
+set(TARGET_LINK_LIBS ${PAPI_LIBRARIES})
 
 # An option to silence the break_state function warnings
 # these warnings are only encountered during improper API usage

@@ -28,9 +28,8 @@ $ make
 $ make install
 ```
 
-The `make install` command will use an active virtual environment's path.
+The `make install` command will attempt to use an active virtual environment's path.
 Outside of a virtual environment, `make install` will install to Python root site-packages.
-The installation prefix can alternatively be set, e.g., `-DCMAKE_INSTALL_PREFIX:PATH=/usr/lib`.
 
 Library specific variables and default values:
 ```
@@ -40,12 +39,18 @@ ENABLE_HDF5:BOOL=OFF
 SILENCE_WARNINGS:BOOL=OFF
 ```
 
-Variables to explicitly set dependency paths:
-```
-Python_ROOT_DIR
-PAPI_PREFIX
-MPI_HOME
-HDF5_ROOT
+Example variables to explicitly set paths and options:
+```bash
+cmake \
+  -DUSE_MPI:BOOL=ON \
+  -DENABLE_HDF5:BOOL=ON \
+  -DCMAKE_INSTALL_PREFIX:PATH="$VIRTUAL_ENV" \
+  -DPAPI_PREFIX:PATH="$PAPI_DIR" \
+  -DHDF5_ROOT:PATH="$PHDF5_DIR" \
+  -DPython_ROOT_DIR:PATH="$PYTHON_DIR" \
+  -DMPI_HOME:PATH="$MPI_ROOT" \
+  -DMPIEXEC_EXECUTABLE:PATH="$(command -v mpiexec)" \
+  ../
 ```
 ___
 ### Meson
@@ -68,11 +73,11 @@ ___
 
 Spack provides an [installation guide](https://spack-tutorial.readthedocs.io/en/latest/tutorial_basics.html).
 
-This package is in the current development branch (not the current latest tag: v0.23.1). The next Spack release (which this package will be included in) will likely include packages in a separate repository.
-
 Basic spack installation directions:
 ```bash
-$ . git/spack/share/spack/setup-env.sh
+$ git clone --depth=2 --branch=releases/v1.1 https://github.com/spack/spack.git
+$ cd spack/
+$ . spack/share/spack/setup-env.sh
 $ spack env create pyperfdump
 $ spack env activate pyperfdump
 $ spack add py-perfdump+mpi+hdf5
