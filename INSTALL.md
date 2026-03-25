@@ -77,7 +77,8 @@ Basic spack installation directions:
 ```bash
 $ git clone --depth=2 --branch=releases/v1.1 https://github.com/spack/spack.git
 $ cd spack/
-$ . spack/share/spack/setup-env.sh
+$ git clone https://github.com/spack/spack-packages.git
+$ . share/spack/setup-env.sh
 $ spack env create pyperfdump
 $ spack env activate pyperfdump
 $ spack add py-perfdump+mpi+hdf5
